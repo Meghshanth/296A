@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import '../homePages/home.dart';
+
+final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
 class SignupPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
@@ -58,10 +63,16 @@ class SignupPage extends StatelessWidget {
         User? user = FirebaseAuth.instance.currentUser;
         if (user != null) {
           if (!user.emailVerified) {
-            displaySnackBar(context,
-              'Email not verified, verifiy email before sign in');
-          }else{
-
+            displaySnackBar(
+                context, 'Email not verified, verifiy email before sign in');
+          } else {
+            await secureStorage.write(
+                key: 'user_token', value: userCredential.user?.uid);
+            // Navigate to the desired component/screen
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+            );
           }
         }
 
@@ -111,7 +122,7 @@ class SignupPage extends StatelessWidget {
                 onPressed: () => _signin(context),
                 child: Text('Sign In'),
               ),
-              SizedBox(width: 8.0),
+              SizedBox(width: 16.0),
               ElevatedButton(
                 onPressed: () => _signup(context),
                 child: Text('Sign Up'),
