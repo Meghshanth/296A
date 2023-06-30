@@ -38,16 +38,27 @@ class HomePage extends StatelessWidget {
         } else {
           // User token does not exist, prompt for sign-in
           print('User token not found');
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => SignupPage()),
+          // );
+
           Navigator.pushReplacement(
+            // Temp for Dev
             context,
-            MaterialPageRoute(builder: (context) => SignupPage()),
+            MaterialPageRoute(builder: (context) => HomeScreen()),
           );
         }
       } catch (e) {
         Navigator.pushReplacement(
+          // Temp for Dev
           context,
-          MaterialPageRoute(builder: (context) => SignupPage()),
+          MaterialPageRoute(builder: (context) => HomeScreen()),
         );
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => SignupPage()),
+        // );
       }
     }
 
