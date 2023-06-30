@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:pfsi/commonNavigation/commonNavigation.dart';
 
 import '../homePages/home.dart';
 
@@ -71,7 +72,7 @@ class SignupPage extends StatelessWidget {
             // Navigate to the desired component/screen
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomeScreen()),
+              MaterialPageRoute(builder: (context) => CommonNavigation()),
             );
           }
         }
@@ -100,7 +101,7 @@ class SignupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('PFSI')),
+      appBar: AppBar(title: Text('Bronco Help', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red[300],),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(

@@ -6,6 +6,7 @@ import 'firebase_options.dart';
 import 'authPages/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'dart:async';
 
 final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
@@ -39,51 +40,60 @@ class HomePage extends StatelessWidget {
         } else {
           // User token does not exist, prompt for sign-in
           print('User token not found');
-          // Navigator.pushReplacement(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => SignupPage()),
-          // );
-
           Navigator.pushReplacement(
-            // Temp for Dev
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen()),
+            MaterialPageRoute(builder: (context) => SignupPage()),
           );
+
+          // Navigator.pushReplacement(
+          //   // Temp for Dev
+          //   context,
+          //   MaterialPageRoute(builder: (context) => HomeScreen()),
+          // );
         }
       } catch (e) {
-        Navigator.pushReplacement(
-          // Temp for Dev
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
         // Navigator.pushReplacement(
+        //   // Temp for Dev
         //   context,
-        //   MaterialPageRoute(builder: (context) => SignupPage()),
+        //   MaterialPageRoute(builder: (context) => HomeScreen()),
         // );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SignupPage()),
+        );
       }
     }
 
-    checkUserLoggedIn();
+    Timer(Duration(seconds: 2), () {
+      checkUserLoggedIn();
+    });
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Home'),
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Welcome to the Home Page!',
-              style: TextStyle(fontSize: 24),
+              'Go',
+              style: TextStyle(
+                fontSize: 90,
+                foreground: Paint()
+                  ..style = PaintingStyle.stroke
+                  ..strokeWidth = 5
+                  ..color = Colors.red,
+              ),
             ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                // TODO: Add functionality for the button
-              },
-              child: Text('Button'),
-            ),
+            SizedBox(height: 2),
+            Text(
+              'Broncos!',
+              style: TextStyle(
+                fontSize: 90,
+                foreground: Paint()
+                  ..style = PaintingStyle.stroke
+                  ..strokeWidth = 5
+                  ..color = Colors.red,
+              ),
+            )
           ],
         ),
       ),
@@ -115,10 +125,11 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
-      home: CommonNavigation(),
+      // home: HomePage(), 
+      home: CommonNavigation(), //DEV
     );
   }
 }
