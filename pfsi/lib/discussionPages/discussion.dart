@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:pfsi/commonNavigation/commonNavigation.dart';
 
-class HomeScreen extends StatelessWidget {
+class Discussion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Home',
+          'Disussions',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue,
@@ -20,7 +19,7 @@ class HomeScreen extends StatelessWidget {
             children: [
               SizedBox(height: 10),
               Text(
-                'Welcome Bronco!',
+                'Welcome To Discussion!',
                 textAlign: TextAlign
                     .center, // Align the text within the center of the card
               ),
@@ -29,15 +28,10 @@ class HomeScreen extends StatelessWidget {
                 child: InkWell(
                     splashColor: Colors.blue.withAlpha(60),
                     onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CommonNavigation()),
-                      );
+                      debugPrint('Card tapped.');
                     },
                     child: ListTile(
-                        leading: Icon(Icons.star_border_outlined,
-                            color: Colors.blue[600]),
+                        leading: Icon(Icons.reviews_outlined, color: Colors.blue[600]),
                         title: Text(
                           'Reviews',
                           textAlign: TextAlign
@@ -57,15 +51,10 @@ class HomeScreen extends StatelessWidget {
                 child: InkWell(
                     splashColor: Colors.blue.withAlpha(30),
                     onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CommonNavigation()),
-                      );
+                      debugPrint('Card tapped.');
                     },
                     child: ListTile(
-                      leading: Icon(Icons.groups_2_outlined,
-                          color: Colors.blue[600]),
+                      leading: Icon(Icons.help_center_outlined,  color: Colors.blue[600]),
                       title: Text(
                         'Discussions',
                         textAlign: TextAlign
