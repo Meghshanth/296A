@@ -82,26 +82,12 @@ class _CommonNavigationState extends State<CommonNavigation> {
   }
 }
 
-class Page1 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Page 1'),
-    );
-  }
-}
-
-class Page2 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Page 2'),
-    );
-  }
-}
-
 void main() {
   runApp(MaterialApp(
+     theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
+        useMaterial3: true,
+      ),
     home: CommonNavigation(),
   ));
 }
