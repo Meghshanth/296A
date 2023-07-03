@@ -14,6 +14,7 @@ class DiscussionPage extends StatefulWidget {
 class _DiscussionPageState extends State<DiscussionPage>
     with TickerProviderStateMixin {
   var isDialOpen = ValueNotifier<bool>(false);
+  String _selectedOption = 'All discussions';
   @override
   Widget build(BuildContext context) {
     void logout() async {
@@ -63,19 +64,27 @@ class _DiscussionPageState extends State<DiscussionPage>
               padding: const EdgeInsets.all(16),
               physics: const BouncingScrollPhysics(),
               child: Center(
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 800),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 10),
-                      Text(
-                        'Welcome To Discussion!',
-                        textAlign: TextAlign
-                            .center, // Align the text within the center of the card
-                      ),
-                    ],
-                  ),
+                child: Column(
+                  children: [
+                    SizedBox(height: 10),
+                    DropdownButton<String>(
+                      value: _selectedOption,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedOption = newValue!;
+                        });
+                      },
+                      items: <String>[
+                        'All discussions',
+                        'Your discussions',
+                      ].map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ],
                 ),
               )),
           floatingActionButton: FloatingActionButton(
