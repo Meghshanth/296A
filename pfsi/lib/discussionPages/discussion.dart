@@ -16,7 +16,10 @@ class _DiscussionPageState extends State<DiscussionPage>
   var isDialOpen = ValueNotifier<bool>(false);
   String _selectedOption = 'All discussions';
   @override
+  List<String> items = List.generate(20, (index) => 'Item $index');
   Widget build(BuildContext context) {
+    print(items);
+
     void logout() async {
       try {
         await FirebaseAuth.instance.signOut();
@@ -32,14 +35,14 @@ class _DiscussionPageState extends State<DiscussionPage>
     }
 
     return WillPopScope(
-      onWillPop: () async {
-        if (isDialOpen.value) {
-          isDialOpen.value = false;
-          return false;
-        }
-        return true;
-      },
-      child: Scaffold(
+        onWillPop: () async {
+          if (isDialOpen.value) {
+            isDialOpen.value = false;
+            return false;
+          }
+          return true;
+        },
+        child: Scaffold(
           appBar: AppBar(
             title: Text(
               'Discussion',
@@ -60,45 +63,65 @@ class _DiscussionPageState extends State<DiscussionPage>
             ],
             backgroundColor: Colors.red[300],
           ),
-          body: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              physics: const BouncingScrollPhysics(),
-              child: Center(
-                child: Column(
-                  children: [
-                    SizedBox(height: 10),
-                    DropdownButton<String>(
-                      value: _selectedOption,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedOption = newValue!;
-                        });
-                      },
-                      items: <String>[
-                        'All discussions',
-                        'Your discussions',
-                      ].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ],
+          body: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                SizedBox(height: 10),
+                DropdownButton<String>(
+                  value: _selectedOption,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedOption = newValue!;
+                    });
+                  },
+                  items: <String>[
+                    'All discussions',
+                    'Your discussions',
+                  ].map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
                 ),
-              )),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: items.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Column(children: [
+                        InkWell(
+                          splashColor: Colors.red,
+                          hoverColor: Colors.red[200],
+                          onTap: () {
+                            print('Item clicked: ${items[index]}');
+                          },
+                          child: ListTile(
+                            title: Text(
+                              items[index],
+                            ),
+                            subtitle: Text('Subtitle for ${items[index]}'),
+                          ),
+                        ),
+                        Divider()
+                      ]);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => DiscussionAdd()),
               );
-              // Add your onPressed code here!
             },
             backgroundColor: Colors.red[300],
             tooltip: 'Add Discussion',
             child: const Icon(Icons.create_outlined),
-          )),
-    );
+          ),
+        ));
   }
 }
