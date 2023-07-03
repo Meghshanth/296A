@@ -68,7 +68,7 @@ class SignupPage extends StatelessWidget {
                 context, 'Email not verified, verifiy email before sign in');
           } else {
             await secureStorage.write(
-                key: 'user_token', value: userCredential.user?.uid);
+                key: 'user_token', value: userCredential.user?.refreshToken);
             // Navigate to the desired component/screen
             Navigator.pushReplacement(
               context,

@@ -6,9 +6,11 @@ import 'firebase_options.dart';
 import 'authPages/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 
 final FlutterSecureStorage secureStorage = FlutterSecureStorage();
+final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,20 +24,21 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void checkUserLoggedIn() async {
-      String? userToken = await secureStorage.read(key: 'user_token');
       try {
-        if (userToken != null) {
-          // User token exists, proceed with automatic sign-in
-          print('User token found: $userToken');
+         final User? user = FirebaseAuth.instance.currentUser;
+          String? uuid = user?.uid;
+        if (uuid != null) {
+         
 
-          // Authenticate the user using the saved token
-          UserCredential userCredential =
-              await FirebaseAuth.instance.signInWithCustomToken(userToken);
+          // User token exists, proceed with automatic sign-in
+          print('User token found: $uuid');
+
+  
 
           // Navigate to the desired component/screen
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen()),
+            MaterialPageRoute(builder: (context) => CommonNavigation()),
           );
         } else {
           // User token does not exist, prompt for sign-in
@@ -52,6 +55,7 @@ class HomePage extends StatelessWidget {
           // );
         }
       } catch (e) {
+        print(e);
         // Navigator.pushReplacement(
         //   // Temp for Dev
         //   context,
@@ -128,8 +132,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
-      // home: HomePage(), 
-      home: CommonNavigation(), //DEV
+      home: HomePage(),
+      // home: CommonNavigation(), //DEV
     );
   }
 }

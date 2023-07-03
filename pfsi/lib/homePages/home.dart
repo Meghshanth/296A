@@ -29,7 +29,7 @@ class HomeScreen extends StatelessWidget {
                 child: InkWell(
                     splashColor: Colors.blue.withAlpha(60),
                     onTap: () {
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => CommonNavigation()),
@@ -57,7 +57,7 @@ class HomeScreen extends StatelessWidget {
                 child: InkWell(
                     splashColor: Colors.blue.withAlpha(30),
                     onTap: () {
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => CommonNavigation()),
