@@ -2,89 +2,152 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pfsi/authPages/signup.dart';
-import 'package:pfsi/commonNavigation/commonNavigation.dart';
+import 'package:intl/intl.dart';
 
-class DiscussionView extends StatelessWidget {
-  String documentId = '';
-  DiscussionView(String documentId) {
-    this.documentId = documentId;
+class Comment {
+  final String userid;
+  final String reply;
+  final Timestamp dateTimestamp;
+
+  Comment(
+      {required this.userid, required this.reply, required this.dateTimestamp});
+}
+
+class Discussion {
+  final String topic;
+  final String question;
+  final Timestamp dateTimestamp;
+  final String userid;
+  final List<Comment> comments;
+
+  Discussion({
+    required this.topic,
+    required this.question,
+    required this.dateTimestamp,
+    required this.userid,
+    required this.comments,
+  });
+
+  factory Discussion.fromMap(Map<String, dynamic> map) {
+    final List<dynamic> comments = map['comments'];
+    List<Comment> commentList = comments
+        .map(
+          (comment) => Comment(
+            userid: comment['userid'],
+            reply: comment['reply'],
+            dateTimestamp: comment['dateTimestamp'],
+          ),
+        )
+        .toList();
+
+    return Discussion(
+      topic: map['topic'],
+      question: map['question'],
+      dateTimestamp: map['dateTimestamp'],
+      userid: map['userid'],
+      comments: commentList,
+    );
   }
+}
+
+class DiscussionView extends StatefulWidget {
+  final String documentId;
+
+  DiscussionView(this.documentId);
+
+  @override
+  _DiscussionViewState createState() => _DiscussionViewState();
+}
+
+class _DiscussionViewState extends State<DiscussionView> {
+  List<Comment> comments = [];
+  String userid = '';
   TextEditingController _questionController = TextEditingController();
   TextEditingController _topicController = TextEditingController();
+  TextEditingController _replyController = TextEditingController();
+
+  String? get documentId => null;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDocumentById(widget.documentId);
+  }
+
+  Future<void> fetchDocumentById(String documentId) async {
+    try {
+      DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+          .collection('discussion_list')
+          .doc(documentId)
+          .get();
+
+      if (documentSnapshot.exists) {
+        Map<String, dynamic>? data =
+            documentSnapshot.data() as Map<String, dynamic>?;
+        Discussion discussion = Discussion.fromMap(data!);
+        _topicController.text = discussion.topic;
+        _questionController.text = discussion.question;
+        setState(() {
+          comments = discussion.comments;
+          userid = discussion.userid;
+        });
+      } else {
+        // Document does not exist
+        print('Document does not exist');
+      }
+    } catch (e) {
+      // Error occurred
+      print('Error: $e');
+    }
+  }
+
+  void logout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      // Perform any additional actions after logout
+      print('Logout successful');
+      Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SignupPage()),
+      );
+    } catch (e) {
+      // Handle logout errors
+      print('Logout failed: $e');
+    }
+  }
+
+  void goBack() {
+    Navigator.pop(context);
+  }
+
+  Future<void> addComment() async {
+    final User? user = FirebaseAuth.instance.currentUser;
+    String? uuid = user?.uid;
+    if (uuid != null) {
+      Comment newComment = Comment(
+          userid: userid,
+          reply: _replyController.text,
+          dateTimestamp: Timestamp.now());
+      comments.insert(0, newComment);
+      
+      FirebaseFirestore.instance
+          .collection('discussion_list')
+          .doc(documentId)
+          .update({comments: comments})
+          .then((value) => print("User Added"))
+          .catchError((error) => print("Failed to add user: $error"));
+    } else {
+      print('no uuid');
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => SignupPage()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    Future<void> fetchDocumentById(String documentId) async {
-      try {
-        DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-            .collection('discussion_list')
-            .doc(documentId)
-            .get();
-
-        if (documentSnapshot.exists) {
-          // Document exists
-          Map<String, dynamic> dataObj = documentSnapshot.data() as Map<String,
-              dynamic>; // Save the document data in dataObj variable
-          print(dataObj);
-          _topicController.text = dataObj['topic'];
-          _questionController.text = dataObj['question'];
-        } else {
-          // Document does not exist
-          print('Document does not exist');
-        }
-      } catch (e) {
-        // Error occurred
-        print('Error: $e');
-      }
-    }
-
-    fetchDocumentById(documentId);
-
-    void logout() async {
-      try {
-        await FirebaseAuth.instance.signOut();
-        // Perform any additional actions after logout
-        print('Logout successful');
-        Navigator.pop(context);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => SignupPage()),
-        );
-      } catch (e) {
-        // Handle logout errors
-        print('Logout failed: $e');
-      }
-    }
-
-    void goBack() {
-      Navigator.pop(context);
-    }
-
-    Future<void> addDiscussion() async {
-      final User? user = FirebaseAuth.instance.currentUser;
-      String? uuid = user?.uid;
-      if (uuid != null) {
-        Map<String, dynamic> payload = {
-          "topic": _topicController.text,
-          "question": _questionController.text,
-          "comments": [],
-          "dateTimestamp": DateTime.now(),
-          "userid": uuid
-        };
-        FirebaseFirestore.instance
-            .collection('discussion_list')
-            .add(payload)
-            .then((value) => print("User Added"))
-            .catchError((error) => print("Failed to add user: $error"));
-      } else {
-        print('no uuid');
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => SignupPage()),
-        );
-      }
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -92,11 +155,12 @@ class DiscussionView extends StatelessWidget {
           style: TextStyle(color: Colors.white),
         ),
         leading: IconButton(
-            onPressed: goBack,
-            icon: Icon(
-              Icons.arrow_back_outlined,
-              color: Colors.white,
-            )),
+          onPressed: goBack,
+          icon: Icon(
+            Icons.arrow_back_outlined,
+            color: Colors.white,
+          ),
+        ),
         actions: [
           TextButton.icon(
             onPressed: logout,
@@ -133,20 +197,88 @@ class DiscussionView extends StatelessWidget {
               maxLines: null,
               keyboardType: TextInputType.multiline,
               decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter your question',
-                  labelText: "Question"),
+                border: OutlineInputBorder(),
+                hintText: 'Enter your question',
+                labelText: "Question",
+              ),
             ),
             SizedBox(height: 16.0),
+            Expanded(
+              child: Card(
+                color: const Color.fromARGB(255, 252, 242, 243),
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        'Replies',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    Divider(),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: comments.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Column(
+                            children: [
+                              ListTile(
+                                  title: Text(comments[index].reply),
+                                  subtitle: Row(
+                                    children: [
+                                      Text(
+                                          style: TextStyle(fontSize: 12),
+                                          DateFormat('yyyy-MM-dd HH:mm:ss')
+                                              .format(comments[index]
+                                                  .dateTimestamp
+                                                  .toDate())),
+                                      SizedBox(width: 16.0),
+                                      if (comments[index].userid == userid)
+                                        Container(
+                                          padding: EdgeInsets.all(2.0),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red[300],
+                                            borderRadius:
+                                                BorderRadius.circular(2.0),
+                                          ),
+                                          child: Text(
+                                            "OP",
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  )),
+                              Divider(),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 16.0),
+                    Container(
+                        margin: EdgeInsets.all(2.0),
+                        child: TextField(
+                          controller: _replyController,
+                          maxLines: null,
+                          keyboardType: TextInputType.multiline,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            hintText: 'Enter your Reply',
+                            labelText: "Reply",
+                          ),
+                        )),
+                  ],
+                ),
+              ),
+            ),
             ElevatedButton(
               onPressed: () {
-                // Get the entered question
-                String question = _questionController.text;
-                String topic = _topicController.text;
-
-                // Submit button logic here
-                addDiscussion();
-                print('Submitted question: $question $topic');
+                addComment();
               },
               child: Text('Submit'),
             ),
@@ -155,4 +287,10 @@ class DiscussionView extends StatelessWidget {
       ),
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: DiscussionView('documentId'),
+  ));
 }
