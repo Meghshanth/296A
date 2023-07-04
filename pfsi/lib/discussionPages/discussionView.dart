@@ -12,25 +12,34 @@ class DiscussionView extends StatelessWidget {
   TextEditingController _questionController = TextEditingController();
   TextEditingController _topicController = TextEditingController();
 
-  // Replace 'your_collection' with the name of your collection in Firestore
-// Replace 'your_document_id' with the ID of the document you want to retrieve
-  // Future<void> getDocument() async {
-  //   FirebaseFirestore.instance
-  //       .collection('discussion_list')
-  //       .doc('QC1FGo4WqoSM3BdxQUVD')
-  //       .get()
-  //       .then((DocumentSnapshot documentSnapshot) {
-  //     if (documentSnapshot.exists) {
-  //       print('Document data: ${documentSnapshot.data()}');
-  //     } else {
-  //       print('Document does not exist on the database');
-  //     }
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
-    print(documentId);
+    Future<void> fetchDocumentById(String documentId) async {
+      try {
+        DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+            .collection('discussion_list')
+            .doc(documentId)
+            .get();
+
+        if (documentSnapshot.exists) {
+          // Document exists
+          Map<String, dynamic> dataObj = documentSnapshot.data() as Map<String,
+              dynamic>; // Save the document data in dataObj variable
+          print(dataObj);
+          _topicController.text = dataObj['topic'];
+          _questionController.text = dataObj['question'];
+        } else {
+          // Document does not exist
+          print('Document does not exist');
+        }
+      } catch (e) {
+        // Error occurred
+        print('Error: $e');
+      }
+    }
+
+    fetchDocumentById(documentId);
+
     void logout() async {
       try {
         await FirebaseAuth.instance.signOut();
@@ -79,7 +88,7 @@ class DiscussionView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Discussion',
+          'View Discussion',
           style: TextStyle(color: Colors.white),
         ),
         leading: IconButton(
@@ -109,21 +118,24 @@ class DiscussionView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             TextField(
+              enabled: false,
               controller: _topicController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: 'Enter your Topic',
+                labelText: "Topic",
               ),
             ),
             SizedBox(height: 16.0),
             TextField(
+              enabled: false,
               controller: _questionController,
               maxLines: null,
               keyboardType: TextInputType.multiline,
               decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Enter your question',
-              ),
+                  border: OutlineInputBorder(),
+                  hintText: 'Enter your question',
+                  labelText: "Question"),
             ),
             SizedBox(height: 16.0),
             ElevatedButton(

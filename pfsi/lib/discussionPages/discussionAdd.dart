@@ -8,22 +8,6 @@ class DiscussionAdd extends StatelessWidget {
   TextEditingController _questionController = TextEditingController();
   TextEditingController _topicController = TextEditingController();
 
-  // Replace 'your_collection' with the name of your collection in Firestore
-// Replace 'your_document_id' with the ID of the document you want to retrieve
-  // Future<void> getDocument() async {
-  //   FirebaseFirestore.instance
-  //       .collection('discussion_list')
-  //       .doc('QC1FGo4WqoSM3BdxQUVD')
-  //       .get()
-  //       .then((DocumentSnapshot documentSnapshot) {
-  //     if (documentSnapshot.exists) {
-  //       print('Document data: ${documentSnapshot.data()}');
-  //     } else {
-  //       print('Document does not exist on the database');
-  //     }
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     void logout() async {
@@ -107,6 +91,7 @@ class DiscussionAdd extends StatelessWidget {
               controller: _topicController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
+                labelText: "Topic",
                 hintText: 'Enter your Topic',
               ),
             ),
@@ -117,6 +102,7 @@ class DiscussionAdd extends StatelessWidget {
               keyboardType: TextInputType.multiline,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
+                labelText: "Question",
                 hintText: 'Enter your question',
               ),
             ),
