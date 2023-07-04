@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:pfsi/authPages/signup.dart';
 import 'package:pfsi/discussionPages/discussionAdd.dart';
@@ -19,9 +17,17 @@ class _DiscussionPageState extends State<DiscussionPage>
     with TickerProviderStateMixin {
   final User? user = FirebaseAuth.instance.currentUser;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final int _perPage = 10; // Number of documents to fetch per page
-  DocumentSnapshot? _lastDocument; // Last fetched document for pagination
+  // final int _perPage = 20; // Number of documents to fetch per page
+  // DocumentSnapshot? _lastDocument; // Last fetched document for pagination
   String _selectedOption = 'All discussions';
+  final ValueNotifier<String> _selectedOptionNotifier =
+      ValueNotifier<String>('All discussions');
+  @override
+  void dispose() {
+    _selectedOptionNotifier.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     String? uuid = user?.uid;
@@ -41,27 +47,15 @@ class _DiscussionPageState extends State<DiscussionPage>
     }
 
     Stream<QuerySnapshot> _fetchData() {
-      Query query = _firestore
-          .collection('discussion_list')
-          .orderBy('dateTimestamp',
-              descending: true) // Order by a field for pagination
-          .limit(_perPage); // Limit the number of documents per page
+      Query query = _firestore.collection('discussion_list').orderBy(
+          'dateTimestamp',
+          descending: true); // Order by a field for pagination
+      // .limit(_perPage); // Limit the number of documents per page
       if (_selectedOption == 'Your discussions') {
-        query.where('userid', isEqualTo: uuid);
+        query = query.where('userid', isEqualTo: uuid);
       }
-      if (_lastDocument != null) {
-        query = query.startAfterDocument(_lastDocument!);
-      }
-      return query.snapshots();
-    }
 
-    void _loadMoreData() {
-      final snapshots = _fetchData();
-      snapshots.listen((snapshot) {
-        if (snapshot.docs.length > 0) {
-          _lastDocument = snapshot.docs[snapshot.docs.length - 1];
-        }
-      });
+      return query.snapshots();
     }
 
     return Scaffold(
@@ -96,8 +90,7 @@ class _DiscussionPageState extends State<DiscussionPage>
                 setState(() {
                   _selectedOption = newValue!;
                 });
-                _lastDocument = null;
-                _fetchData();
+                _selectedOptionNotifier.value = newValue!;
               },
               items: <String>[
                 'All discussions',
@@ -110,42 +103,53 @@ class _DiscussionPageState extends State<DiscussionPage>
               }).toList(),
             ),
             Flexible(
-                child: StreamBuilder<QuerySnapshot>(
-              stream: _fetchData(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final documents = snapshot.data!.docs;
-                  return ListView.builder(
-                    itemCount: documents.length,
-                    itemBuilder: (context, index) {
-                      final data =
-                          documents[index].data() as Map<String, dynamic>;
-                      return Column(children: [
-                        InkWell(
-                            splashColor: Colors.red,
-                            hoverColor: Colors.red[200],
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        DiscussionView(documents[index].id)),
-                              );
-                            },
-                            child: ListTile(
-                              title: Text(data['topic']),
-                            )),
-                        Divider()
-                      ]);
+              child: ValueListenableBuilder<String>(
+                valueListenable: _selectedOptionNotifier,
+                builder: (context, selectedOption, child) {
+                  return StreamBuilder<QuerySnapshot>(
+                    stream: _fetchData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        final documents = snapshot.data!.docs;
+                        return ListView.builder(
+                          itemCount: documents.length,
+                          itemBuilder: (context, index) {
+                            final data =
+                                documents[index].data() as Map<String, dynamic>;
+                            return Column(
+                              children: [
+                                InkWell(
+                                  splashColor: Colors.red,
+                                  hoverColor: Colors.red[200],
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DiscussionView(
+                                          documents[index].id,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: ListTile(
+                                    title: Text(data['topic']),
+                                  ),
+                                ),
+                                Divider(),
+                              ],
+                            );
+                          },
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        return CircularProgressIndicator();
+                      }
                     },
                   );
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  return CircularProgressIndicator();
-                }
-              },
-            ))
+                },
+              ),
+            ),
           ],
         ),
       ),
