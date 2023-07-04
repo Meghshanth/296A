@@ -44,7 +44,8 @@ class DiscussionAdd extends StatelessWidget {
         FirebaseFirestore.instance
             .collection('discussion_list')
             .add(payload)
-            .then((value) => print("User Added"))
+            .then(
+                (value) => {print("Discussion Added"), Navigator.pop(context)})
             .catchError((error) => print("Failed to add user: $error"));
       } else {
         print('no uuid');

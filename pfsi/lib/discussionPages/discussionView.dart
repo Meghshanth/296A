@@ -4,21 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pfsi/authPages/signup.dart';
 import 'package:intl/intl.dart';
 
-class Comment {
-  final String userid;
-  final String reply;
-  final Timestamp dateTimestamp;
-
-  Comment(
-      {required this.userid, required this.reply, required this.dateTimestamp});
-}
-
 class Discussion {
   final String topic;
   final String question;
   final Timestamp dateTimestamp;
   final String userid;
-  final List<Comment> comments;
+  final List<dynamic> comments;
 
   Discussion({
     required this.topic,
@@ -30,22 +21,13 @@ class Discussion {
 
   factory Discussion.fromMap(Map<String, dynamic> map) {
     final List<dynamic> comments = map['comments'];
-    List<Comment> commentList = comments
-        .map(
-          (comment) => Comment(
-            userid: comment['userid'],
-            reply: comment['reply'],
-            dateTimestamp: comment['dateTimestamp'],
-          ),
-        )
-        .toList();
 
     return Discussion(
       topic: map['topic'],
       question: map['question'],
       dateTimestamp: map['dateTimestamp'],
       userid: map['userid'],
-      comments: commentList,
+      comments: comments,
     );
   }
 }
@@ -60,13 +42,12 @@ class DiscussionView extends StatefulWidget {
 }
 
 class _DiscussionViewState extends State<DiscussionView> {
-  List<Comment> comments = [];
+  List<dynamic> comments = [];
   String userid = '';
   TextEditingController _questionController = TextEditingController();
   TextEditingController _topicController = TextEditingController();
   TextEditingController _replyController = TextEditingController();
-
-  String? get documentId => null;
+  String documentId = '';
 
   @override
   void initState() {
@@ -90,6 +71,7 @@ class _DiscussionViewState extends State<DiscussionView> {
         setState(() {
           comments = discussion.comments;
           userid = discussion.userid;
+          this.documentId = documentId;
         });
       } else {
         // Document does not exist
@@ -125,17 +107,18 @@ class _DiscussionViewState extends State<DiscussionView> {
     final User? user = FirebaseAuth.instance.currentUser;
     String? uuid = user?.uid;
     if (uuid != null) {
-      Comment newComment = Comment(
-          userid: userid,
-          reply: _replyController.text,
-          dateTimestamp: Timestamp.now());
+      Map<String, dynamic> newComment = {
+        'userid': userid,
+        'reply': _replyController.text,
+        'dateTimestamp': Timestamp.now()
+      };
       comments.insert(0, newComment);
-      
+      print(this.documentId);
       FirebaseFirestore.instance
           .collection('discussion_list')
-          .doc(documentId)
-          .update({comments: comments})
-          .then((value) => print("User Added"))
+          .doc(this.documentId)
+          .update({'comments': comments})
+          .then((value) => {print("Comment Added"), Navigator.pop(context)})
           .catchError((error) => print("Failed to add user: $error"));
     } else {
       print('no uuid');
@@ -225,17 +208,17 @@ class _DiscussionViewState extends State<DiscussionView> {
                           return Column(
                             children: [
                               ListTile(
-                                  title: Text(comments[index].reply),
+                                  title: Text(comments[index]['reply']),
                                   subtitle: Row(
                                     children: [
                                       Text(
                                           style: TextStyle(fontSize: 12),
                                           DateFormat('yyyy-MM-dd HH:mm:ss')
                                               .format(comments[index]
-                                                  .dateTimestamp
+                                                      ['dateTimestamp']
                                                   .toDate())),
                                       SizedBox(width: 16.0),
-                                      if (comments[index].userid == userid)
+                                      if (comments[index]['userid'] == userid)
                                         Container(
                                           padding: EdgeInsets.all(2.0),
                                           decoration: BoxDecoration(
