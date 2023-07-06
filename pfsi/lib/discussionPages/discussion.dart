@@ -161,8 +161,8 @@ class _DiscussionPageState extends State<DiscussionPage>
           );
         },
         backgroundColor: Colors.red[300],
-        tooltip: 'Add Discussion',
-        child: const Icon(Icons.create_outlined),
+        tooltip: 'Add a New Discussion',
+        child: const Icon(Icons.add_outlined),
       ),
     );
   }

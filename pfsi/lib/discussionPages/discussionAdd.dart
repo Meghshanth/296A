@@ -59,7 +59,7 @@ class DiscussionAdd extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Discussion',
+          'Add Discussion',
           style: TextStyle(color: Colors.white),
         ),
         leading: IconButton(

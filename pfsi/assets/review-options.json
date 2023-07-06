@@ -1,0 +1,33 @@
+{
+  "services": [
+    "--Services--",
+    "Auto",
+    "Coffee Shop",
+    "Dentist",
+    "Haircut",
+    "Laundry",
+    "Local Restaurants",
+    "Pedicure",
+    "Off-Campus Housing",
+    "Saloon",
+    "Tea Shop"
+  ],
+  "regions": [
+    "--Regions--",
+    "Campbell",
+    "Cupertino",
+    "Gilroy",
+    "Los Altos",
+    "Los Altos Hills",
+    "Los Gatos",
+    "Milpitas",
+    "Monte Sereno",
+    "Morgan Hill",
+    "Mountain View",
+    "Palo Alto",
+    "San Jose",
+    "Santa Clara",
+    "Saratoga",
+    "Sunnyvale"
+  ]
+}
