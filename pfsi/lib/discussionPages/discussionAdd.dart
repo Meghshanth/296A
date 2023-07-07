@@ -98,6 +98,7 @@ class DiscussionAdd extends StatelessWidget {
             ),
             SizedBox(height: 16.0),
             TextField(
+              minLines: 3,
               controller: _questionController,
               maxLines: null,
               keyboardType: TextInputType.multiline,

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pfsi/authPages/signup.dart';
-import 'package:dropdown_search/dropdown_search.dart';
-import 'package:pfsi/commonNavigation/commonNavigation.dart';
 import 'package:flutter/services.dart'
     show FilteringTextInputFormatter, TextInputFormatter, rootBundle;
 import 'dart:convert';
@@ -37,6 +35,7 @@ class _AddReviewWidgetState extends State<AddReview> {
 
   TextEditingController _commentController = TextEditingController();
   TextEditingController _businessNameController = TextEditingController();
+  TextEditingController _pricingController = TextEditingController();
 
   Future<String> _loadJsonData() async {
     return await rootBundle.loadString('review-options.json');
@@ -97,22 +96,49 @@ class _AddReviewWidgetState extends State<AddReview> {
       Navigator.pop(context);
     }
 
+    void displaySnackBar(BuildContext context, String message) {
+      final snackBar = SnackBar(content: Text(message));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+
     Future<void> addReview() async {
       final User? user = FirebaseAuth.instance.currentUser;
       String? uuid = user?.uid;
       if (uuid != null) {
+        if (_businessNameController.text.isEmpty) {
+          displaySnackBar(context, 'Business Name can\'t be empty');
+          return;
+        }
+        if (_rating == 0) {
+          displaySnackBar(context, 'Please select a rating');
+          return;
+        }
+        if (_pricingController.text.isEmpty) {
+          displaySnackBar(context, 'Please set a price');
+          return;
+        }
+        if (selectedService == '--Services--') {
+          displaySnackBar(context, 'Please select a service');
+          return;
+        }
+        if (selectedRegion == '--Regions--') {
+          displaySnackBar(context, 'Please select a region');
+          return;
+        }
         Map<String, dynamic> payload = {
-          "business name": _businessNameController.text,
-          "question": _commentController.text,
-          "comments": [],
+          "businessName": _businessNameController.text,
+          "comment": _commentController.text,
           "dateTimestamp": DateTime.now(),
-          "userid": uuid
+          "userid": uuid,
+          "pricing": _pricingController.text,
+          "rating": _rating,
+          "region": selectedRegion,
+          "service": selectedService
         };
         FirebaseFirestore.instance
-            .collection('discussion_list')
+            .collection('review_list')
             .add(payload)
-            .then(
-                (value) => {print("Discussion Added"), Navigator.pop(context)})
+            .then((value) => {print("Review Added"), Navigator.pop(context)})
             .catchError((error) => print("Failed to add user: $error"));
       } else {
         print('no uuid');
@@ -201,6 +227,7 @@ class _AddReviewWidgetState extends State<AddReview> {
             ),
             SizedBox(height: 16.0),
             TextField(
+              controller: _pricingController,
               keyboardType: TextInputType.number,
               inputFormatters: <TextInputFormatter>[
                 FilteringTextInputFormatter.digitsOnly,
@@ -264,6 +291,7 @@ class _AddReviewWidgetState extends State<AddReview> {
             SizedBox(height: 16.0),
             TextField(
               controller: _commentController,
+              minLines: 3,
               maxLines: null,
               keyboardType: TextInputType.multiline,
               decoration: InputDecoration(

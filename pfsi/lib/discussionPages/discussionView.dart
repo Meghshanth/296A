@@ -177,6 +177,7 @@ class _DiscussionViewState extends State<DiscussionView> {
             TextField(
               enabled: false,
               controller: _questionController,
+              minLines: 3,
               maxLines: null,
               keyboardType: TextInputType.multiline,
               decoration: InputDecoration(
