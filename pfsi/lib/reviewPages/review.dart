@@ -70,7 +70,10 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
             child: ValueListenableBuilder<String>(
               valueListenable: _selectedReviewTypeNotifier,
               builder: (context, value, child) {
-                return DropdownButton<String>(
+                return DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: 'Select an option',
+                  ),
                   value: value,
                   onChanged: (String? newValue) {
                     setState(() {
