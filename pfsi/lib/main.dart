@@ -5,11 +5,9 @@ import 'package:pfsi/homePages/home.dart';
 import 'firebase_options.dart';
 import 'authPages/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 
-final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 void main() async {

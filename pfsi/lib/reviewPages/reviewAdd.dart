@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pfsi/authPages/signup.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:pfsi/commonNavigation/commonNavigation.dart';
 import 'package:flutter/services.dart'
     show FilteringTextInputFormatter, TextInputFormatter, rootBundle;
@@ -29,11 +30,12 @@ class AddReview extends StatefulWidget {
 class _AddReviewWidgetState extends State<AddReview> {
   List<String> serviceOptions = [];
   List<String> regionsOptions = [];
+  int _rating = 0;
 
   String selectedService = "";
   String selectedRegion = "";
 
-  TextEditingController _questionController = TextEditingController();
+  TextEditingController _commentController = TextEditingController();
   TextEditingController _businessNameController = TextEditingController();
 
   Future<String> _loadJsonData() async {
@@ -101,7 +103,7 @@ class _AddReviewWidgetState extends State<AddReview> {
       if (uuid != null) {
         Map<String, dynamic> payload = {
           "business name": _businessNameController.text,
-          "question": _questionController.text,
+          "question": _commentController.text,
           "comments": [],
           "dateTimestamp": DateTime.now(),
           "userid": uuid
@@ -214,14 +216,60 @@ class _AddReviewWidgetState extends State<AddReview> {
               ),
             ),
             SizedBox(height: 16.0),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        'Rating:',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(width: 8.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          for (int i = 1; i <= 5; i++)
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _rating = i;
+                                });
+                              },
+                              child: Icon(
+                                i <= _rating ? Icons.star : Icons.star_border,
+                                color: Colors.amber,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(5.0),
+                    decoration: BoxDecoration(
+                      color: Colors.red[300],
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    child: Text(
+                      _rating.toString() + "/5",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ]),
+            SizedBox(height: 16.0),
             TextField(
-              controller: _questionController,
+              controller: _commentController,
               maxLines: null,
               keyboardType: TextInputType.multiline,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: "Question",
-                hintText: 'Enter your question',
+                labelText: "Comment",
+                hintText: 'Enter your comment',
               ),
             ),
             SizedBox(height: 16.0),

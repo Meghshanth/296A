@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pfsi/commonNavigation/commonNavigation.dart';
-
 import '../homePages/home.dart';
 
-final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
 class SignupPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
@@ -67,8 +64,6 @@ class SignupPage extends StatelessWidget {
             displaySnackBar(
                 context, 'Email not verified, verifiy email before sign in');
           } else {
-            await secureStorage.write(
-                key: 'user_token', value: userCredential.user?.refreshToken);
             // Navigate to the desired component/screen
             Navigator.pushReplacement(
               context,
