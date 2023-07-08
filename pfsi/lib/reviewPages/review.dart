@@ -68,13 +68,11 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     String? uuid = user?.uid;
 
     Stream<QuerySnapshot>? _fetchData() {
-      print("@here");
       Query query = _firestore
           .collection('review_list')
           .orderBy('dateTimestamp', descending: true);
@@ -88,11 +86,11 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
       if (_selectedReviewType == 'Your reviews') {
         query = query.where('userid', isEqualTo: uuid);
       }
-      // return query.snapshots();
-      return query.snapshots().handleError((error) {
-        // Handle the error here
-        print('Error fetching data: $error');
-      });
+      return query.snapshots();
+      // return query.snapshots().handleError((error) {
+      //   // Handle the error here
+      //   print('Error fetching data: $error');
+      // });
     }
 
     void logout() async {
@@ -215,7 +213,7 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
                   child: Column(
                     children: [
                       SizedBox(
-                        height: 10.0,
+                        height: 16.0,
                       ),
                       Text(
                         'Reviews',
@@ -262,13 +260,22 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
                                 },
                               );
                             } else {
-                              return Card(
+                              return Container(
+                                width: double.infinity,
                                 margin: EdgeInsets.only(top: 16),
-                                child: Padding(
-                                  padding: EdgeInsets.all(16),
-                                  child: Text(
-                                    'No reviews found for this category',
-                                    style: TextStyle(fontSize: 16),
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: Card(
+                                    color: Colors.red[300],
+                                    margin: EdgeInsets.all(16),
+                                    child: Padding(
+                                      padding: EdgeInsets.all(16),
+                                      child: Text(
+                                        'No reviews found for this category',
+                                        style: TextStyle(
+                                            fontSize: 16, color: Colors.white),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               );
