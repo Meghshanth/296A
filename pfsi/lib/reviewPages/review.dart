@@ -5,7 +5,6 @@ import 'package:pfsi/reviewPages/reviewAdd.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
-
 import '../discussionPages/discussionView.dart';
 
 class Review extends StatefulWidget {
@@ -22,6 +21,8 @@ Future<String> _loadJsonData() async {
 class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
   String selectedService = "All Services";
   String selectedRegion = "All Regions";
+
+  String averagePrice = '';
 
   List<String> serviceOptions = [];
   List<String> regionOptions = [];
@@ -73,6 +74,7 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
     String? uuid = user?.uid;
 
     Stream<QuerySnapshot>? _fetchData() {
+      print("2her222");
       Query query = _firestore
           .collection('review_list')
           .orderBy('dateTimestamp', descending: true);
@@ -86,7 +88,28 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
       if (_selectedReviewType == 'Your reviews') {
         query = query.where('userid', isEqualTo: uuid);
       }
-      return query.snapshots();
+
+      // snapshots.listen((QuerySnapshot snapshot) {
+      //   // Process the documents here
+
+      //   List<QueryDocumentSnapshot> documents = snapshot.docs;
+      //   agregateData(documents, snapshot.size);
+      // });
+
+      Stream<QuerySnapshot> snapshots = query.snapshots();
+
+      snapshots.take(1).listen((QuerySnapshot snapshot) {
+        List<QueryDocumentSnapshot> documents = snapshot.docs;
+        List<Object?> dataList = documents.map((doc) => doc.data()).toList();
+
+        // Call your function to aggregate the data
+        aggregateData(dataList);
+      });
+
+      return snapshots;
+
+      // return query.snapshots();
+
       // return query.snapshots().handleError((error) {
       //   // Handle the error here
       //   print('Error fetching data: $error');
@@ -207,6 +230,36 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
             SizedBox(
               height: 10.0,
             ),
+            Row(
+              children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Average Pricing',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          '\$$averagePrice',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
             Flexible(
               child: Card(
                   margin: EdgeInsets.only(top: 16),
@@ -305,5 +358,25 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
         child: const Icon(Icons.add_outlined),
       ),
     );
+  }
+
+  void aggregateData(List<Object?> snapshots) {
+    print('@here');
+    double sum = 0;
+    int count = snapshots.length;
+
+    snapshots.forEach((snapshot) {
+      if (snapshot is Map<String, dynamic>) {
+        double pricing = snapshot['pricing'];
+        sum += pricing;
+      }
+    });
+
+    double average = sum / count;
+    if (averagePrice != average.toStringAsFixed(2)) {
+      setState(() {
+        averagePrice = average.toStringAsFixed(2);
+      });
+    }
   }
 }
