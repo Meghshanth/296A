@@ -1,6 +1,6 @@
 {
   "services": [
-    "--Services--",
+    "All Services",
     "Auto",
     "Coffee Shop",
     "Dentist",
@@ -13,7 +13,7 @@
     "Tea Shop"
   ],
   "regions": [
-    "--Regions--",
+    "All Regions",
     "Campbell",
     "Cupertino",
     "Gilroy",
