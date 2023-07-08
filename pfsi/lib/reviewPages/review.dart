@@ -28,8 +28,6 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
 
   String _selectedReviewType = 'All reviews';
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final ValueNotifier<String> _selectedReviewTypeNotifier =
-      ValueNotifier<String>('All reviews');
   final User? user = FirebaseAuth.instance.currentUser;
 
   Future<List<String>> _getServiceOptionsFromJson() async {
@@ -70,11 +68,6 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
     });
   }
 
-  @override
-  void dispose() {
-    _selectedReviewTypeNotifier.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -232,64 +225,59 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
                         height: 10.0,
                       ),
                       Flexible(
-                          child: ValueListenableBuilder<String>(
-                        valueListenable: _selectedReviewTypeNotifier,
-                        builder: (context, selectedOption, child) {
-                          return StreamBuilder<QuerySnapshot>(
-                            stream: _fetchData(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                final documents = snapshot.data!.docs;
-                                if (documents.isNotEmpty) {
-                                  return ListView.builder(
-                                    itemCount: documents.length,
-                                    itemBuilder: (context, index) {
-                                      final data = documents[index].data()
-                                          as Map<String, dynamic>;
-                                      return Column(
-                                        children: [
-                                          InkWell(
-                                            splashColor: Colors.red,
-                                            hoverColor: Colors.red[200],
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      DiscussionView(
-                                                    documents[index].id,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                            child: ListTile(
-                                              title: Text(data['businessName']),
+                          child: StreamBuilder<QuerySnapshot>(
+                        stream: _fetchData(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            final documents = snapshot.data!.docs;
+                            if (documents.isNotEmpty) {
+                              return ListView.builder(
+                                itemCount: documents.length,
+                                itemBuilder: (context, index) {
+                                  final data = documents[index].data()
+                                      as Map<String, dynamic>;
+                                  return Column(
+                                    children: [
+                                      InkWell(
+                                        splashColor: Colors.red,
+                                        hoverColor: Colors.red[200],
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DiscussionView(
+                                                documents[index].id,
+                                              ),
                                             ),
-                                          ),
-                                          Divider(),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                } else {
-                                  return Card(
-                                    margin: EdgeInsets.only(top: 16),
-                                    child: Padding(
-                                      padding: EdgeInsets.all(16),
-                                      child: Text(
-                                        'No reviews found for this category',
-                                        style: TextStyle(fontSize: 16),
+                                          );
+                                        },
+                                        child: ListTile(
+                                          title: Text(data['businessName']),
+                                        ),
                                       ),
-                                    ),
+                                      Divider(),
+                                    ],
                                   );
-                                }
-                              } else if (snapshot.hasError) {
-                                return Text('Error!!!: ${snapshot.error}');
-                              } else {
-                                return CircularProgressIndicator();
-                              }
-                            },
-                          );
+                                },
+                              );
+                            } else {
+                              return Card(
+                                margin: EdgeInsets.only(top: 16),
+                                child: Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Text(
+                                    'No reviews found for this category',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              );
+                            }
+                          } else if (snapshot.hasError) {
+                            return Text('Error!!!: ${snapshot.error}');
+                          } else {
+                            return CircularProgressIndicator();
+                          }
                         },
                       ))
                     ],
