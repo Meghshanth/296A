@@ -81,6 +81,7 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
     String? uuid = user?.uid;
 
     Stream<QuerySnapshot>? _fetchData() {
+      print("@here");
       Query query = _firestore
           .collection('review_list')
           .orderBy('dateTimestamp', descending: true);
@@ -94,7 +95,6 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
       if (_selectedReviewType == 'Your reviews') {
         query = query.where('userid', isEqualTo: uuid);
       }
-      print(query.parameters);
       // return query.snapshots();
       return query.snapshots().handleError((error) {
         // Handle the error here
@@ -158,33 +158,25 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
                           SizedBox(
                             height: 10.0,
                           ),
-                          ValueListenableBuilder<String>(
-                            valueListenable: _selectedReviewTypeNotifier,
-                            builder: (context, value, child) {
-                              return DropdownButtonFormField<String>(
-                                decoration: InputDecoration(
-                                  labelText: 'Select review type',
-                                ),
-                                value: value,
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    _selectedReviewType = newValue!;
-                                  });
-                                  _selectedReviewTypeNotifier.value = newValue!;
-                                },
-                                items: <String>[
-                                  'All reviews',
-                                  'Your reviews',
-                                ].map<DropdownMenuItem<String>>(
-                                  (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  },
-                                ).toList(),
+                          DropdownButtonFormField<String>(
+                            value: _selectedReviewType,
+                            items: <String>[
+                              'All reviews',
+                              'Your reviews',
+                            ].map((option) {
+                              return DropdownMenuItem<String>(
+                                value: option,
+                                child: Text(option),
                               );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedReviewType = value!;
+                              });
                             },
+                            decoration: InputDecoration(
+                              labelText: 'Select a region',
+                            ),
                           ),
                           DropdownButtonFormField<String>(
                             value: selectedRegion,
@@ -228,14 +220,19 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
               child: Card(
                   margin: EdgeInsets.only(top: 16),
                   child: Column(
-                    children: [  Text(
-                            'Reviews',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          Flexible( child: ValueListenableBuilder<String>(
+                    children: [
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      Text(
+                        'Reviews',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
+                      Flexible(
+                          child: ValueListenableBuilder<String>(
                         valueListenable: _selectedReviewTypeNotifier,
                         builder: (context, selectedOption, child) {
                           return StreamBuilder<QuerySnapshot>(
