@@ -47,6 +47,8 @@ class _ReviewViewState extends State<ReviewView> {
   TextEditingController _regionController = TextEditingController();
   TextEditingController _businessNameController = TextEditingController();
   TextEditingController _serviceController = TextEditingController();
+  TextEditingController _pricingController = TextEditingController();
+  TextEditingController _ratingController = TextEditingController();
   bool isLoading = true;
   Review? review;
   bool isEditable = false;
@@ -71,6 +73,8 @@ class _ReviewViewState extends State<ReviewView> {
         _regionController.text = review!.region;
         _businessNameController.text = review!.businessName;
         _serviceController.text = review!.service;
+        _pricingController.text = review!.pricing.toString();
+        _ratingController.text = review!.rating.toString();
         setState(() {
           userid = review!.userid;
           this.documentId = documentId;
@@ -130,188 +134,195 @@ class _ReviewViewState extends State<ReviewView> {
     }
   }
 
+  void saveFields() async {
+    // Update the review document in Firebase
+    try {
+      await FirebaseFirestore.instance
+          .collection('review_list')
+          .doc(documentId)
+          .update({
+        'region': _regionController.text,
+        'businessName': _businessNameController.text,
+        'service': _serviceController.text,
+        'pricing': int.parse(_pricingController.text),
+        'rating': int.parse(_ratingController.text),
+      });
 
-void saveFields() async {
-  // Update the review document in Firebase
-  try {
-    await FirebaseFirestore.instance
-        .collection('review_list')
-        .doc(documentId)
-        .update({
-          'region': _regionController.text,
-          'businessName': _businessNameController.text,
-          'service': _serviceController.text,
-        });
-
-    // Disable editing
-    setState(() {
-      isEditable = false;
-    });
-  } catch (e) {
-    // Handle update error
-    print('Update failed: $e');
+      // Disable editing
+      setState(() {
+        isEditable = false;
+      });
+    } catch (e) {
+      // Handle update error
+      print('Update failed: $e');
+    }
   }
-}
 
-
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text(
-        'View Review',
-        style: TextStyle(color: Colors.white),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        // ...
       ),
-      leading: IconButton(
-        onPressed: goBack,
-        icon: Icon(
-          Icons.arrow_back_outlined,
-          color: Colors.white,
-        ),
-      ),
-      actions: [
-        if (isEditable)
-          IconButton(
-            onPressed: saveFields,
-            icon: Icon(
-              Icons.save,
-              color: Colors.white,
-            ),
-          ),
-        IconButton(
-          onPressed: logout,
-          icon: Icon(
-            Icons.logout,
-            color: Colors.white,
-          ),
-        ),
-      ],
-      backgroundColor: Colors.red[300],
-    ),
-    body: isLoading
-        ? Center(
-            child: CircularProgressIndicator(),
-          )
-        : Center(
-            child: SingleChildScrollView(
-              child: Container(
-                width: 300,
-                height: 400,
-                child: Card(
-                  elevation: 3,
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Review Details',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.0,
+                      ),
+                    ),
+                    SizedBox(height: 16.0),
+                    Row(
                       children: [
                         Text(
-                          'Review Details',
+                          'Region:',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 18.0,
+                            fontSize: 16.0,
                           ),
                         ),
-                        SizedBox(height: 16.0),
-                        Row(
-                          children: [
-                            Text(
-                              'Region:',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16.0,
-                              ),
+                        SizedBox(width: 8.0),
+                        Expanded(
+                          child: TextFormField(
+                            enabled: isEditable,
+                            controller: _regionController,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter your region',
                             ),
-                            SizedBox(width: 8.0),
-                            Expanded(
-                              child: TextFormField(
-                                enabled: isEditable,
-                                controller: _regionController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Enter your region',
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8.0),
-                        Row(
-                          children: [
-                            Text(
-                              'Business Name:',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16.0,
-                              ),
-                            ),
-                            SizedBox(width: 8.0),
-                            Expanded(
-                              child: TextFormField(
-                                enabled: isEditable,
-                                controller: _businessNameController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Enter your business name',
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8.0),
-                        Row(
-                          children: [
-                            Text(
-                              'Service:',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16.0,
-                              ),
-                            ),
-                            SizedBox(width: 8.0),
-                            Expanded(
-                              child: TextFormField(
-                                enabled: isEditable,
-                                controller: _serviceController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  hintText: 'Enter your service',
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 16.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            if (isEditable)
-                              ElevatedButton(
-                                onPressed: saveFields,
-                                child: Text('Save'),
-                              ),
-                            if (!isEditable && FirebaseAuth.instance.currentUser?.uid == review?.userid)
-                              ElevatedButton(
-                                onPressed: editFields,
-                                child: Text('Edit'),
-                              ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-  );
-}
-
-}
-
+                    SizedBox(height: 8.0),
+                    Row(
+                      children: [
+                        Text(
+                          'Business Name:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.0,
+                          ),
+                        ),
+                        SizedBox(width: 8.0),
+                        Expanded(
+                          child: TextFormField(
+                            enabled: isEditable,
+                            controller: _businessNameController,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter your business name',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.0),
+                    Row(
+                      children: [
+                        Text(
+                          'Service:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.0,
+                          ),
+                        ),
+                        SizedBox(width: 8.0),
+                        Expanded(
+                          child: TextFormField(
+                            enabled: isEditable,
+                            controller: _serviceController,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter your service',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.0),
+                    Row(
+                      children: [
+                        Text(
+                          'Pricing:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.0,
+                          ),
+                        ),
+                        SizedBox(width: 8.0),
+                        Expanded(
+                          child: TextFormField(
+                            enabled: isEditable,
+                            controller: _pricingController,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter the pricing',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.0),
+                    Row(
+                      children: [
+                        Text(
+                          'Rating:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.0,
+                          ),
+                        ),
+                        SizedBox(width: 8.0),
+                        Expanded(
+                          child: TextFormField(
+                            enabled: isEditable,
+                            controller: _ratingController,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Enter the rating',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                                              if (isEditable)
+                                                ElevatedButton(
+                                                  onPressed: saveFields,
+                                                  child: Text('Save'),
+                                                ),
+                                              if (!isEditable &&
+                                                  FirebaseAuth.instance.currentUser?.uid ==
+                                                      review?.userid)
+                                                ElevatedButton(
+                                                  onPressed: editFields,
+                                                  child: Text('Edit'),
+                                                ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                          );
+                        }
+                      }
 void main() {
-  runApp(MaterialApp(
-    home: ReviewView('documentId'),
-  ));
-}
-
-
+                        runApp(MaterialApp(
+                          home: ReviewView('documentId'),
+                        ));
+                      }
