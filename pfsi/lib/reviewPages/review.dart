@@ -6,6 +6,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
 import '../discussionPages/discussionView.dart';
+import 'reviewView.dart';
 
 class Review extends StatefulWidget {
   const Review({Key? key}) : super(key: key);
@@ -390,7 +391,7 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  DiscussionView(
+                                                  ReviewView(
                                                 documents[index].id,
                                               ),
                                             ),
