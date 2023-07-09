@@ -404,10 +404,12 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
                                               data['region']),
                                           subtitle: Text(
                                             'pricing: ' +
+                                                '\$' +
                                                 data['pricing'].toString() +
                                                 ' | ' +
                                                 'rating: ' +
-                                                data['rating'].toString(),
+                                                data['rating'].toString() +
+                                                "/5",
                                             style: TextStyle(
                                               fontSize: 16,
                                               color: Colors.grey,
