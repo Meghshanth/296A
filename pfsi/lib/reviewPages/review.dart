@@ -327,7 +327,7 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
                               return Align(
                                   alignment: Alignment.center,
                                   child: Row(
-                                     mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
                                         '$value',
@@ -397,7 +397,22 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
                                           );
                                         },
                                         child: ListTile(
-                                          title: Text(data['businessName']),
+                                          title: Text(data['businessName'] +
+                                              ' | ' +
+                                              data['service'] +
+                                              ' | ' +
+                                              data['region']),
+                                          subtitle: Text(
+                                            'pricing: ' +
+                                                data['pricing'].toString() +
+                                                ' | ' +
+                                                'rating: ' +
+                                                data['rating'].toString(),
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                       Divider(),
