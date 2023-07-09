@@ -22,7 +22,8 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
   String selectedService = "All Services";
   String selectedRegion = "All Regions";
 
-  String averagePrice = '';
+  final ValueNotifier<String> averagePriceNotifier = ValueNotifier('');
+  final ValueNotifier<String> averageRatingNotifier = ValueNotifier('');
 
   List<String> serviceOptions = [];
   List<String> regionOptions = [];
@@ -74,7 +75,6 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
     String? uuid = user?.uid;
 
     Stream<QuerySnapshot>? _fetchData() {
-      print("2her222");
       Query query = _firestore
           .collection('review_list')
           .orderBy('dateTimestamp', descending: true);
@@ -189,7 +189,7 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
                               });
                             },
                             decoration: InputDecoration(
-                              labelText: 'Select a region',
+                              labelText: 'Select review type',
                             ),
                           ),
                           DropdownButtonFormField<String>(
@@ -232,32 +232,125 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
             ),
             Row(
               children: [
-                Card(
+                Expanded(
+                    child: Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Average Pricing',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Average Pricing',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )),
                         SizedBox(height: 8),
-                        Text(
-                          '\$$averagePrice',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green,
-                          ),
+                        ValueListenableBuilder<String>(
+                          valueListenable: averagePriceNotifier,
+                          builder: (context, value, _) {
+                            if (selectedService == 'All Services') {
+                              return Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Select a Service',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green,
+                                    ),
+                                  ));
+                            } else if (value == 'NoRecords') {
+                              return Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'No Records',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green,
+                                    ),
+                                  ));
+                            } else {
+                              return Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    '\$$value',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green,
+                                    ),
+                                  ));
+                            }
+                          },
                         ),
                       ],
                     ),
                   ),
-                )
+                )),
+                Expanded(
+                    child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Average Rating',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )),
+                        SizedBox(height: 8),
+                        ValueListenableBuilder<String>(
+                          valueListenable: averageRatingNotifier,
+                          builder: (context, value, _) {
+                            if (value == 'NoRecords') {
+                              return Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'No Records',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.amber,
+                                    ),
+                                  ));
+                            } else {
+                              return Align(
+                                  alignment: Alignment.center,
+                                  child: Row(
+                                     mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '$value',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.amber,
+                                        ),
+                                      ),
+                                      SizedBox(width: 2),
+                                      Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                      ),
+                                    ],
+                                  ));
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ))
               ],
             ),
             Flexible(
@@ -361,22 +454,32 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
   }
 
   void aggregateData(List<Object?> snapshots) {
-    print('@here');
-    double sum = 0;
+    double pricingSum = 0;
+    double ratingSum = 0;
     int count = snapshots.length;
 
-    snapshots.forEach((snapshot) {
-      if (snapshot is Map<String, dynamic>) {
-        double pricing = snapshot['pricing'];
-        sum += pricing;
-      }
-    });
-
-    double average = sum / count;
-    if (averagePrice != average.toStringAsFixed(2)) {
-      setState(() {
-        averagePrice = average.toStringAsFixed(2);
+    if (count != 0) {
+      snapshots.forEach((snapshot) {
+        if (snapshot is Map<String, dynamic>) {
+          if (selectedService != 'All Services') {
+            double pricing = snapshot['pricing'];
+            pricingSum += pricing;
+          }
+          int rating = snapshot['rating'];
+          ratingSum += rating;
+        }
       });
+      if (selectedService != 'All Services') {
+        double average = pricingSum / count;
+        averagePriceNotifier.value = average.toStringAsFixed(2);
+      } else {
+        averagePriceNotifier.value = 'N/A';
+      }
+      double averageRating = ratingSum / count;
+      averageRatingNotifier.value = averageRating.toStringAsFixed(2);
+    } else {
+      averagePriceNotifier.value = 'NoRecords';
+      averageRatingNotifier.value = 'NoRecords';
     }
   }
 }
