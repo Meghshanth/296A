@@ -5,8 +5,21 @@ import 'package:pfsi/reviewPages/reviewAdd.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:convert';
-import '../discussionPages/discussionView.dart';
 import 'reviewView.dart';
+
+class ServiceData {
+  final List<String> services;
+  final List<String> regions;
+
+  ServiceData({required this.services, required this.regions});
+
+  factory ServiceData.fromJson(Map<String, dynamic> json) {
+    return ServiceData(
+      services: List<String>.from(json['services']),
+      regions: List<String>.from(json['regions']),
+    );
+  }
+}
 
 class Review extends StatefulWidget {
   const Review({Key? key}) : super(key: key);
@@ -313,7 +326,18 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
                         ValueListenableBuilder<String>(
                           valueListenable: averageRatingNotifier,
                           builder: (context, value, _) {
-                            if (value == 'NoRecords') {
+                            if (selectedService == 'All Services') {
+                              return Align(
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Select a Service',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.amber,
+                                    ),
+                                  ));
+                            } else if (value == 'NoRecords') {
                               return Align(
                                   alignment: Alignment.center,
                                   child: Text(
@@ -390,8 +414,7 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ReviewView(
+                                              builder: (context) => ReviewView(
                                                 documents[index].id,
                                               ),
                                             ),
