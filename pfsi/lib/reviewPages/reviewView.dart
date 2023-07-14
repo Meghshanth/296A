@@ -217,6 +217,22 @@ class _ReviewViewState extends State<ReviewView> {
     }
   }
 
+
+void deleteReview() async {
+  try {
+    await FirebaseFirestore.instance
+        .collection('review_list')
+        .doc(documentId)
+        .delete();
+
+    print("Review Deleted");
+    Navigator.pop(context);
+  } catch (e) {
+    // Handle delete error
+    print('Delete failed: $e');
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -372,14 +388,19 @@ class _ReviewViewState extends State<ReviewView> {
               ),
             ),
             SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: isEditable
-                  ? () {
-                      saveFields();
-                    }
-                  : null,
-              child: Text('Submit'),
-            ),
+            Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Updated MainAxisAlignment
+            children: [
+              ElevatedButton(
+                onPressed: isEditable ? () => saveFields() : null,
+                child: Text('Submit'),
+              ),
+              ElevatedButton(
+                onPressed: isEditable ? () => deleteReview() : null,
+                child: Text('Delete'),
+              ),
+            ],
+          ),            
           ],
         ),
       ),
