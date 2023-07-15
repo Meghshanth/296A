@@ -79,87 +79,86 @@ class _DiscussionPageState extends State<DiscussionPage>
         ],
         backgroundColor: Colors.red[300],
       ),
-      // body: Padding(
-      //   padding: const EdgeInsets.all(16),
-      //   child: Column(
-      //     children: [
-      //       SizedBox(height: 10),
-      //       DropdownButton<String>(
-      //         value: _selectedOption,
-      //         onChanged: (String? newValue) {
-      //           setState(() {
-      //             _selectedOption = newValue!;
-      //           });
-      //           _selectedOptionNotifier.value = newValue!;
-      //         },
-      //         items: <String>[
-      //           'All discussions',
-      //           'Your discussions',
-      //         ].map<DropdownMenuItem<String>>((String value) {
-      //           return DropdownMenuItem<String>(
-      //             value: value,
-      //             child: Text(value),
-      //           );
-      //         }).toList(),
-      //       ),
-      //       Flexible(
-      //         child: ValueListenableBuilder<String>(
-      //           valueListenable: _selectedOptionNotifier,
-      //           builder: (context, selectedOption, child) {
-      //             return StreamBuilder<QuerySnapshot>(
-      //               stream: _fetchData(),
-      //               builder: (context, snapshot) {
-      //                 if (snapshot.hasData) {
-      //                   final documents = snapshot.data!.docs;
-      //                   return ListView.builder(
-      //                     itemCount: documents.length,
-      //                     itemBuilder: (context, index) {
-      //                       final data =
-      //                           documents[index].data() as Map<String, dynamic>;
-      //                       return Column(
-      //                         children: [
-      //                           InkWell(
-      //                             splashColor: Colors.red,
-      //                             hoverColor: Colors.red[200],
-      //                             onTap: () {
-      //                               Navigator.push(
-      //                                 context,
-      //                                 MaterialPageRoute(
-      //                                   builder: (context) => DiscussionView(
-      //                                     documents[index].id,
-      //                                   ),
-      //                                 ),
-      //                               );
-      //                             },
-      //                             child: ListTile(
-      //                               title: Text(data['topic']),
-      //                             ),
-      //                           ),
-      //                           Divider(),
-      //                         ],
-      //                       );
-      //                     },
-      //                   );
-      //                 } else if (snapshot.hasError) {
-      //                   return Text('Error: ${snapshot.error}');
-      //                 } else {
-      //                   return CircularProgressIndicator();
-      //                 }
-      //               },
-      //             );
-      //           },
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
-      body: Text('This is discussions page'),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            SizedBox(height: 10),
+            DropdownButton<String>(
+              value: _selectedOption,
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedOption = newValue!;
+                });
+                _selectedOptionNotifier.value = newValue!;
+              },
+              items: <String>[
+                'All discussions',
+                'Your discussions',
+              ].map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+            Flexible(
+              child: ValueListenableBuilder<String>(
+                valueListenable: _selectedOptionNotifier,
+                builder: (context, selectedOption, child) {
+                  return StreamBuilder<QuerySnapshot>(
+                    stream: _fetchData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        final documents = snapshot.data!.docs;
+                        return ListView.builder(
+                          itemCount: documents.length,
+                          itemBuilder: (context, index) {
+                            final data =
+                                documents[index].data() as Map<String, dynamic>;
+                            return Column(
+                              children: [
+                                InkWell(
+                                  splashColor: Colors.red,
+                                  hoverColor: Colors.red[200],
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DiscussionView(
+                                          documents[index].id,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: ListTile(
+                                    title: Text(data['topic']),
+                                  ),
+                                ),
+                                Divider(),
+                              ],
+                            );
+                          },
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        return CircularProgressIndicator();
+                      }
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => DiscussionAdd()),
-          // );
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => DiscussionAdd()),
+          );
         },
         backgroundColor: Colors.red[300],
         tooltip: 'Add a New Discussion',
