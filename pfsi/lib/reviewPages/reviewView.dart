@@ -133,16 +133,16 @@ class _ReviewViewState extends State<ReviewView> {
           selectedService = serviceOptions[0]; // Add this line
         }
       });
-    });
-    _getRegionsOptionsFromFirebase().then((value) {
-      setState(() {
-        regionsOptions = value;
-        if (regionsOptions.isNotEmpty) {
-          selectedRegion = regionsOptions[0]; // Add this line
-        }
+      _getRegionsOptionsFromFirebase().then((value) {
+        setState(() {
+          regionsOptions = value;
+          if (regionsOptions.isNotEmpty) {
+            selectedRegion = regionsOptions[0]; // Add this line
+          }
+        });
+        fetchDocumentById(widget.documentId);
       });
     });
-    fetchDocumentById(widget.documentId);
   }
 
   Future<void> fetchDocumentById(String documentId) async {
