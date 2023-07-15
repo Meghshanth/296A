@@ -94,14 +94,14 @@ class _AddReviewWidgetState extends State<AddReview> {
         serviceOptions.insert(0, '--Services--');
         selectedService = serviceOptions[
             0]; // Set the first option as the default selected option
-      });
-    });
-    _getRegionsOptionsFromFirebase().then((value) {
-      setState(() {
-        regionsOptions = value;
-        regionsOptions.insert(0, '--Regions--');
-        selectedRegion = regionsOptions[
-            0]; // Set the first option as the default selected option
+        _getRegionsOptionsFromFirebase().then((value) {
+          setState(() {
+            regionsOptions = value;
+            regionsOptions.insert(0, '--Regions--');
+            selectedRegion = regionsOptions[
+                0]; // Set the first option as the default selected option
+          });
+        });
       });
     });
   }
