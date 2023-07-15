@@ -133,16 +133,16 @@ class _ReviewViewState extends State<ReviewView> {
           selectedService = serviceOptions[0]; // Add this line
         }
       });
-    });
-    _getRegionsOptionsFromFirebase().then((value) {
-      setState(() {
-        regionsOptions = value;
-        if (regionsOptions.isNotEmpty) {
-          selectedRegion = regionsOptions[0]; // Add this line
-        }
+      _getRegionsOptionsFromFirebase().then((value) {
+        setState(() {
+          regionsOptions = value;
+          if (regionsOptions.isNotEmpty) {
+            selectedRegion = regionsOptions[0]; // Add this line
+          }
+        });
+        fetchDocumentById(widget.documentId);
       });
     });
-    fetchDocumentById(widget.documentId);
   }
 
   Future<void> fetchDocumentById(String documentId) async {
@@ -294,41 +294,39 @@ class _ReviewViewState extends State<ReviewView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (!serviceOptions.isEmpty)
-              DropdownButtonFormField<String>(
-                value: selectedService,
-                items: serviceOptions.map((option) {
-                  return DropdownMenuItem<String>(
-                    value: option,
-                    key: ValueKey(option),
-                    child: Text(option),
-                  );
-                }).toList(),
-                onChanged: isEditable
-                    ? (value) => setState(() => selectedService = value!)
-                    : null,
-                decoration: InputDecoration(
-                  labelText: 'Select a service',
-                ),
+            DropdownButtonFormField<String>(
+              value: selectedService,
+              items: serviceOptions.map((option) {
+                return DropdownMenuItem<String>(
+                  value: option,
+                  key: ValueKey(option),
+                  child: Text(option),
+                );
+              }).toList(),
+              onChanged: isEditable
+                  ? (value) => setState(() => selectedService = value!)
+                  : null,
+              decoration: InputDecoration(
+                labelText: 'Select a service',
               ),
+            ),
             SizedBox(height: 16.0),
-            if (!regionsOptions.isEmpty)
-              DropdownButtonFormField<String>(
-                value: selectedRegion,
-                items: regionsOptions.map((option) {
-                  return DropdownMenuItem<String>(
-                    value: option,
-                    key: ValueKey(option),
-                    child: Text(option),
-                  );
-                }).toList(),
-                onChanged: isEditable
-                    ? (value) => setState(() => selectedRegion = value!)
-                    : null,
-                decoration: InputDecoration(
-                  labelText: 'Select a region',
-                ),
+            DropdownButtonFormField<String>(
+              value: selectedRegion,
+              items: regionsOptions.map((option) {
+                return DropdownMenuItem<String>(
+                  value: option,
+                  key: ValueKey(option),
+                  child: Text(option),
+                );
+              }).toList(),
+              onChanged: isEditable
+                  ? (value) => setState(() => selectedRegion = value!)
+                  : null,
+              decoration: InputDecoration(
+                labelText: 'Select a region',
               ),
+            ),
             SizedBox(height: 16.0),
             TextField(
               enabled: isEditable,
