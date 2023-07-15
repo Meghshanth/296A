@@ -46,59 +46,55 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final User? user = FirebaseAuth.instance.currentUser;
 
-Future<List<String>> _getServiceOptionsFromFirebase() async {
-  try {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('services_list')
-        .get();
+  Future<List<String>> _getServiceOptionsFromFirebase() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('services_list').get();
 
-    List<String> services = [];
-    querySnapshot.docs.forEach((documentSnapshot) {
-      Map<String, dynamic>? data = documentSnapshot.data() as Map<String, dynamic>?;
-      if (data != null && data['services'] != null) {
-        List<dynamic>? servicesList = data['services'];
-        if (servicesList != null) {
-          services.addAll(servicesList.cast<String>());
+      List<String> services = [];
+      querySnapshot.docs.forEach((documentSnapshot) {
+        Map<String, dynamic>? data =
+            documentSnapshot.data() as Map<String, dynamic>?;
+        if (data != null && data['services'] != null) {
+          List<dynamic>? servicesList = data['services'];
+          if (servicesList != null) {
+            services.addAll(servicesList.cast<String>());
+          }
         }
-      }
-    });
+      });
 
-    return services;
-  } catch (e) {
-    // Handle error
-    print('Error fetching services: $e');
-    return [];
+      return services;
+    } catch (e) {
+      // Handle error
+      print('Error fetching services: $e');
+      return [];
+    }
   }
-}
 
-Future<List<String>> _getRegionsOptionsFromFirebase() async {
-  try {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('regions_list')
-        .get();
+  Future<List<String>> _getRegionsOptionsFromFirebase() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('regions_list').get();
 
-    List<String> regions = [];
-    querySnapshot.docs.forEach((documentSnapshot) {
-      Map<String, dynamic>? data = documentSnapshot.data() as Map<String, dynamic>?;
-      if (data != null && data['regions'] != null) {
-        List<dynamic>? regionList = data['regions'];
-        if (regionList != null) {
-          regions.addAll(regionList.cast<String>());
+      List<String> regions = [];
+      querySnapshot.docs.forEach((documentSnapshot) {
+        Map<String, dynamic>? data =
+            documentSnapshot.data() as Map<String, dynamic>?;
+        if (data != null && data['regions'] != null) {
+          List<dynamic>? regionList = data['regions'];
+          if (regionList != null) {
+            regions.addAll(regionList.cast<String>());
+          }
         }
-      }
-    });
+      });
 
-    return regions;
-  } catch (e) {
-    // Handle error
-    print('Error fetching regions: $e');
-    return [];
+      return regions;
+    } catch (e) {
+      // Handle error
+      print('Error fetching regions: $e');
+      return [];
+    }
   }
-}
-
-
-
-
 
   @override
   void initState() {
@@ -106,7 +102,9 @@ Future<List<String>> _getRegionsOptionsFromFirebase() async {
     _getServiceOptionsFromFirebase().then((value) {
       setState(() {
         serviceOptions = value;
-        selectedService = serviceOptions.isNotEmpty ? serviceOptions[0] : '';
+        serviceOptions.insert(0, "All Services");
+        selectedService =
+            serviceOptions.isNotEmpty ? serviceOptions[0] : 'All Services';
 
         // selectedService = serviceOptions[
         //     0]; // Set the first option as the default selected option
@@ -116,7 +114,9 @@ Future<List<String>> _getRegionsOptionsFromFirebase() async {
     _getRegionsOptionsFromFirebase().then((value) {
       setState(() {
         regionOptions = value;
-        selectedRegion = regionOptions.isNotEmpty ? regionOptions[0] : '';
+        regionOptions.insert(0, "All Regions");
+        selectedRegion =
+            regionOptions.isNotEmpty ? regionOptions[0] : 'All Regions';
 
         // selectedService = serviceOptions[
         //     0]; // Set the first option as the default selected option

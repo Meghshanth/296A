@@ -91,7 +91,6 @@ class _AddReviewWidgetState extends State<AddReview> {
     _getServiceOptionsFromFirebase().then((value) {
       setState(() {
         serviceOptions = value;
-        serviceOptions.removeAt(0);
         serviceOptions.insert(0, '--Services--');
         selectedService = serviceOptions[
             0]; // Set the first option as the default selected option
@@ -100,7 +99,6 @@ class _AddReviewWidgetState extends State<AddReview> {
     _getRegionsOptionsFromFirebase().then((value) {
       setState(() {
         regionsOptions = value;
-        regionsOptions.removeAt(0);
         regionsOptions.insert(0, '--Regions--');
         selectedRegion = regionsOptions[
             0]; // Set the first option as the default selected option
