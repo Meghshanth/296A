@@ -1,11 +1,11 @@
 {
-    "name": "pfsi",
-    "short_name": "pfsi",
+    "name": "Bronco Help",
+    "short_name": "Bronco Help",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Bronco Help - Project for social impact",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

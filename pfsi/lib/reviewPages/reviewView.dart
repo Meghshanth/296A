@@ -3,8 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pfsi/authPages/signup.dart';
 import 'package:flutter/services.dart'
-    show FilteringTextInputFormatter, TextInputFormatter, rootBundle;
-import 'dart:convert';
+    show FilteringTextInputFormatter, TextInputFormatter;
 
 class ServiceData {
   final List<String> services;
@@ -75,43 +74,72 @@ class _ReviewViewState extends State<ReviewView> {
   Review? review;
   bool isEditable = false;
 
-  Future<String> _loadJsonData() async {
-    return await rootBundle.loadString('review-options.json');
+  Future<List<String>> _getServiceOptionsFromFirebase() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('services_list').get();
+
+      List<String> services = [];
+      querySnapshot.docs.forEach((documentSnapshot) {
+        Map<String, dynamic>? data =
+            documentSnapshot.data() as Map<String, dynamic>?;
+        if (data != null && data['services'] != null) {
+          List<dynamic>? servicesList = data['services'];
+          if (servicesList != null) {
+            services.addAll(servicesList.cast<String>());
+          }
+        }
+      });
+
+      return services;
+    } catch (e) {
+      // Handle error
+      print('Error fetching services: $e');
+      return [];
+    }
   }
 
-  Future<List<String>> _getServiceOptionsFromJson() async {
-    String jsonData = await _loadJsonData();
-    ServiceData serviceData = ServiceData.fromJson(json.decode(jsonData));
-    List<String> services = serviceData.services;
-    return services;
-  }
+  Future<List<String>> _getRegionsOptionsFromFirebase() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('regions_list').get();
 
-  Future<List<String>> _getRegionsOptionsFromJson() async {
-    String jsonData = await _loadJsonData();
-    ServiceData regionsData = ServiceData.fromJson(json.decode(jsonData));
-    List<String> regions = regionsData.regions;
-    return regions;
+      List<String> regions = [];
+      querySnapshot.docs.forEach((documentSnapshot) {
+        Map<String, dynamic>? data =
+            documentSnapshot.data() as Map<String, dynamic>?;
+        if (data != null && data['regions'] != null) {
+          List<dynamic>? regionList = data['regions'];
+          if (regionList != null) {
+            regions.addAll(regionList.cast<String>());
+          }
+        }
+      });
+      return regions;
+    } catch (e) {
+      // Handle error
+      print('Error fetching regions: $e');
+      return [];
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    _getServiceOptionsFromJson().then((value) {
+    _getServiceOptionsFromFirebase().then((value) {
       setState(() {
         serviceOptions = value;
-        serviceOptions.removeAt(0);
-        serviceOptions.insert(0, '--Services--');
-        selectedService = serviceOptions[
-            0]; // Set the first option as the default selected option
+        if (serviceOptions.isNotEmpty) {
+          selectedService = serviceOptions[0]; // Add this line
+        }
       });
     });
-    _getRegionsOptionsFromJson().then((value) {
+    _getRegionsOptionsFromFirebase().then((value) {
       setState(() {
         regionsOptions = value;
-        regionsOptions.removeAt(0);
-        regionsOptions.insert(0, '--Regions--');
-        selectedRegion = regionsOptions[
-            0]; // Set the first option as the default selected option
+        if (regionsOptions.isNotEmpty) {
+          selectedRegion = regionsOptions[0]; // Add this line
+        }
       });
     });
     fetchDocumentById(widget.documentId);
@@ -217,21 +245,20 @@ class _ReviewViewState extends State<ReviewView> {
     }
   }
 
+  void deleteReview() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('review_list')
+          .doc(documentId)
+          .delete();
 
-void deleteReview() async {
-  try {
-    await FirebaseFirestore.instance
-        .collection('review_list')
-        .doc(documentId)
-        .delete();
-
-    print("Review Deleted");
-    Navigator.pop(context);
-  } catch (e) {
-    // Handle delete error
-    print('Delete failed: $e');
+      print("Review Deleted");
+      Navigator.pop(context);
+    } catch (e) {
+      // Handle delete error
+      print('Delete failed: $e');
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -267,37 +294,41 @@ void deleteReview() async {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            DropdownButtonFormField<String>(
-              value: selectedService,
-              items: serviceOptions.map((option) {
-                return DropdownMenuItem<String>(
-                  value: option,
-                  child: Text(option),
-                );
-              }).toList(),
-              onChanged: isEditable
-                  ? (value) => setState(() => selectedService = value!)
-                  : null,
-              decoration: InputDecoration(
-                labelText: 'Select a service',
+            if (!serviceOptions.isEmpty)
+              DropdownButtonFormField<String>(
+                value: selectedService,
+                items: serviceOptions.map((option) {
+                  return DropdownMenuItem<String>(
+                    value: option,
+                    key: ValueKey(option),
+                    child: Text(option),
+                  );
+                }).toList(),
+                onChanged: isEditable
+                    ? (value) => setState(() => selectedService = value!)
+                    : null,
+                decoration: InputDecoration(
+                  labelText: 'Select a service',
+                ),
               ),
-            ),
             SizedBox(height: 16.0),
-            DropdownButtonFormField<String>(
-              value: selectedRegion,
-              items: regionsOptions.map((option) {
-                return DropdownMenuItem<String>(
-                  value: option,
-                  child: Text(option),
-                );
-              }).toList(),
-              onChanged: isEditable
-                  ? (value) => setState(() => selectedRegion = value!)
-                  : null,
-              decoration: InputDecoration(
-                labelText: 'Select a region',
+            if (!regionsOptions.isEmpty)
+              DropdownButtonFormField<String>(
+                value: selectedRegion,
+                items: regionsOptions.map((option) {
+                  return DropdownMenuItem<String>(
+                    value: option,
+                    key: ValueKey(option),
+                    child: Text(option),
+                  );
+                }).toList(),
+                onChanged: isEditable
+                    ? (value) => setState(() => selectedRegion = value!)
+                    : null,
+                decoration: InputDecoration(
+                  labelText: 'Select a region',
+                ),
               ),
-            ),
             SizedBox(height: 16.0),
             TextField(
               enabled: isEditable,
@@ -389,18 +420,19 @@ void deleteReview() async {
             ),
             SizedBox(height: 16.0),
             Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Updated MainAxisAlignment
-            children: [
-              ElevatedButton(
-                onPressed: isEditable ? () => saveFields() : null,
-                child: Text('Submit'),
-              ),
-              ElevatedButton(
-                onPressed: isEditable ? () => deleteReview() : null,
-                child: Text('Delete'),
-              ),
-            ],
-          ),            
+              mainAxisAlignment:
+                  MainAxisAlignment.spaceEvenly, // Updated MainAxisAlignment
+              children: [
+                ElevatedButton(
+                  onPressed: isEditable ? () => saveFields() : null,
+                  child: Text('Submit'),
+                ),
+                ElevatedButton(
+                  onPressed: isEditable ? () => deleteReview() : null,
+                  child: Text('Delete'),
+                ),
+              ],
+            ),
           ],
         ),
       ),

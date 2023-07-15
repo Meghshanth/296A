@@ -3,8 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pfsi/authPages/signup.dart';
 import 'package:flutter/services.dart'
-    show FilteringTextInputFormatter, TextInputFormatter, rootBundle;
-import 'dart:convert';
+    show FilteringTextInputFormatter, TextInputFormatter;
 
 class ServiceData {
   final List<String> services;
@@ -37,28 +36,59 @@ class _AddReviewWidgetState extends State<AddReview> {
   TextEditingController _businessNameController = TextEditingController();
   TextEditingController _pricingController = TextEditingController();
 
-  Future<String> _loadJsonData() async {
-    return await rootBundle.loadString('review-options.json');
+  Future<List<String>> _getServiceOptionsFromFirebase() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('services_list').get();
+
+      List<String> services = [];
+      querySnapshot.docs.forEach((documentSnapshot) {
+        Map<String, dynamic>? data =
+            documentSnapshot.data() as Map<String, dynamic>?;
+        if (data != null && data['services'] != null) {
+          List<dynamic>? servicesList = data['services'];
+          if (servicesList != null) {
+            services.addAll(servicesList.cast<String>());
+          }
+        }
+      });
+
+      return services;
+    } catch (e) {
+      // Handle error
+      print('Error fetching services: $e');
+      return [];
+    }
   }
 
-  Future<List<String>> _getServiceOptionsFromJson() async {
-    String jsonData = await _loadJsonData();
-    ServiceData serviceData = ServiceData.fromJson(json.decode(jsonData));
-    List<String> services = serviceData.services;
-    return services;
-  }
+  Future<List<String>> _getRegionsOptionsFromFirebase() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('regions_list').get();
 
-  Future<List<String>> _getRegionsOptionsFromJson() async {
-    String jsonData = await _loadJsonData();
-    ServiceData regionsData = ServiceData.fromJson(json.decode(jsonData));
-    List<String> regions = regionsData.regions;
-    return regions;
+      List<String> regions = [];
+      querySnapshot.docs.forEach((documentSnapshot) {
+        Map<String, dynamic>? data =
+            documentSnapshot.data() as Map<String, dynamic>?;
+        if (data != null && data['regions'] != null) {
+          List<dynamic>? regionList = data['regions'];
+          if (regionList != null) {
+            regions.addAll(regionList.cast<String>());
+          }
+        }
+      });
+      return regions;
+    } catch (e) {
+      // Handle error
+      print('Error fetching regions: $e');
+      return [];
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    _getServiceOptionsFromJson().then((value) {
+    _getServiceOptionsFromFirebase().then((value) {
       setState(() {
         serviceOptions = value;
         serviceOptions.removeAt(0);
@@ -67,7 +97,7 @@ class _AddReviewWidgetState extends State<AddReview> {
             0]; // Set the first option as the default selected option
       });
     });
-    _getRegionsOptionsFromJson().then((value) {
+    _getRegionsOptionsFromFirebase().then((value) {
       setState(() {
         regionsOptions = value;
         regionsOptions.removeAt(0);
