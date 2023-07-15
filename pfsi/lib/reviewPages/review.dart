@@ -46,24 +46,64 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final User? user = FirebaseAuth.instance.currentUser;
 
-  Future<List<String>> _getServiceOptionsFromJson() async {
-    String jsonData = await _loadJsonData();
-    ServiceData serviceData = ServiceData.fromJson(json.decode(jsonData));
-    List<String> services = serviceData.services;
-    return services;
-  }
+Future<List<String>> _getServiceOptionsFromFirebase() async {
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('services_list')
+        .get();
 
-  Future<List<String>> _getRegionsOptionsFromJson() async {
-    String jsonData = await _loadJsonData();
-    ServiceData serviceData = ServiceData.fromJson(json.decode(jsonData));
-    List<String> regions = serviceData.regions;
-    return regions;
+    List<String> services = [];
+    querySnapshot.docs.forEach((documentSnapshot) {
+      Map<String, dynamic>? data = documentSnapshot.data() as Map<String, dynamic>?;
+      if (data != null && data['services'] != null) {
+        List<dynamic>? servicesList = data['services'];
+        if (servicesList != null) {
+          services.addAll(servicesList.cast<String>());
+        }
+      }
+    });
+
+    return services;
+  } catch (e) {
+    // Handle error
+    print('Error fetching services: $e');
+    return [];
   }
+}
+
+Future<List<String>> _getRegionsOptionsFromFirebase() async {
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('regions_list')
+        .get();
+
+    List<String> regions = [];
+    querySnapshot.docs.forEach((documentSnapshot) {
+      Map<String, dynamic>? data = documentSnapshot.data() as Map<String, dynamic>?;
+      if (data != null && data['regions'] != null) {
+        List<dynamic>? regionList = data['regions'];
+        if (regionList != null) {
+          regions.addAll(regionList.cast<String>());
+        }
+      }
+    });
+
+    return regions;
+  } catch (e) {
+    // Handle error
+    print('Error fetching regions: $e');
+    return [];
+  }
+}
+
+
+
+
 
   @override
   void initState() {
     super.initState();
-    _getServiceOptionsFromJson().then((value) {
+    _getServiceOptionsFromFirebase().then((value) {
       setState(() {
         serviceOptions = value;
         selectedService = serviceOptions.isNotEmpty ? serviceOptions[0] : '';
@@ -73,7 +113,7 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
       });
     });
 
-    _getRegionsOptionsFromJson().then((value) {
+    _getRegionsOptionsFromFirebase().then((value) {
       setState(() {
         regionOptions = value;
         selectedRegion = regionOptions.isNotEmpty ? regionOptions[0] : '';
