@@ -157,7 +157,9 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
         List<Object?> dataList = documents.map((doc) => doc.data()).toList();
 
         // Call your function to aggregate the data
-        aggregateData(dataList);
+        if (selectedService != 'All Services') {
+          aggregateData(dataList);
+        }
       });
 
       return snapshots;
