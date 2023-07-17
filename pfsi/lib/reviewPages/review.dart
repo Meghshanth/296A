@@ -552,14 +552,13 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
           ratingSum += rating;
         }
       });
+      print('@here $selectedService');
       if (selectedService != 'All Services') {
         double average = pricingSum / count;
         averagePriceNotifier.value = average.toStringAsFixed(2);
-      } else {
-        averagePriceNotifier.value = 'N/A';
+        double averageRating = ratingSum / count;
+        averageRatingNotifier.value = averageRating.toStringAsFixed(2);
       }
-      double averageRating = ratingSum / count;
-      averageRatingNotifier.value = averageRating.toStringAsFixed(2);
     } else {
       averagePriceNotifier.value = 'NoRecords';
       averageRatingNotifier.value = 'NoRecords';
