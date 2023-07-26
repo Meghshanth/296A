@@ -262,7 +262,7 @@ class _AddReviewWidgetState extends State<AddReview> {
               controller: _pricingController,
               keyboardType: TextInputType.number,
               inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly,
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
               ],
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
