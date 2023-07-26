@@ -162,7 +162,7 @@ class _AddReviewWidgetState extends State<AddReview> {
           "comment": _commentController.text,
           "dateTimestamp": DateTime.now(),
           "userid": uuid,
-          "pricing": int.parse(_pricingController.text),
+          "pricing": double.parse(_pricingController.text),
           "rating": _rating,
           "region": selectedRegion,
           "service": selectedService

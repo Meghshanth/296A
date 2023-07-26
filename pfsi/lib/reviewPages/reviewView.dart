@@ -24,7 +24,7 @@ class Review {
   final String service;
   final String businessName;
   final String userid;
-  final int pricing;
+  final double pricing;
   final int rating;
   final String comment;
 
@@ -234,7 +234,7 @@ class _ReviewViewState extends State<ReviewView> {
         'region': selectedRegion,
         'businessName': _businessNameController.text,
         'service': selectedService,
-        'pricing': int.parse(_pricingController.text),
+        'pricing': double.parse(_pricingController.text),
         'rating': _rating,
         'comment': _commentController.text
       });
@@ -346,7 +346,7 @@ class _ReviewViewState extends State<ReviewView> {
               controller: _pricingController,
               keyboardType: TextInputType.number,
               inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly,
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
               ],
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
