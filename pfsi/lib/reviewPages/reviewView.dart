@@ -64,6 +64,7 @@ class _ReviewViewState extends State<ReviewView> {
   int _rating = 0;
   String selectedService = "";
   String selectedRegion = "";
+  String uuid = "";
   TextEditingController _businessNameController = TextEditingController();
   TextEditingController _pricingController = TextEditingController();
   TextEditingController _commentController = TextEditingController();
@@ -160,6 +161,8 @@ class _ReviewViewState extends State<ReviewView> {
         _commentController.text = review!.comment;
         _pricingController.text = review!.pricing.toString();
         setState(() {
+          final User? user = FirebaseAuth.instance.currentUser;
+          uuid = user!.uid;
           selectedRegion = review!.region;
           selectedService = review!.service;
           _rating = review!.rating;
@@ -417,20 +420,22 @@ class _ReviewViewState extends State<ReviewView> {
               ),
             ),
             SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceEvenly, // Updated MainAxisAlignment
-              children: [
-                ElevatedButton(
-                  onPressed: isEditable ? () => saveFields() : null,
-                  child: Text('Submit'),
-                ),
-                ElevatedButton(
-                  onPressed: isEditable ? () => deleteReview() : null,
-                  child: Text('Delete'),
-                ),
-              ],
-            ),
+            if (!isLoading)
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceEvenly, // Updated MainAxisAlignment
+                children: [
+                  ElevatedButton(
+                    onPressed: isEditable ? () => saveFields() : null,
+                    child: Text('Submit'),
+                  ),
+                  if (userid == uuid)
+                    ElevatedButton(
+                      onPressed: isEditable ? () => deleteReview() : null,
+                      child: Text('Delete'),
+                    ),
+                ],
+              ),
           ],
         ),
       ),
