@@ -545,7 +545,7 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
       snapshots.forEach((snapshot) {
         if (snapshot is Map<String, dynamic>) {
           if (selectedService != 'All Services') {
-            double pricing = snapshot['pricing'];
+            int pricing = snapshot['pricing'];
             pricingSum += pricing;
           }
           int rating = snapshot['rating'];
@@ -555,11 +555,12 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
       if (selectedService != 'All Services') {
         double average = pricingSum / count;
         averagePriceNotifier.value = average.toStringAsFixed(2);
+        double averageRating = ratingSum / count;
+        averageRatingNotifier.value = averageRating.toStringAsFixed(2);
       } else {
         averagePriceNotifier.value = 'N/A';
       }
-      double averageRating = ratingSum / count;
-      averageRatingNotifier.value = averageRating.toStringAsFixed(2);
+    
     } else {
       averagePriceNotifier.value = 'NoRecords';
       averageRatingNotifier.value = 'NoRecords';

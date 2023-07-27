@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pfsi/commonNavigation/commonNavigation.dart';
 import '../homePages/home.dart';
 
-
 class SignupPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -86,9 +85,11 @@ class SignupPage extends StatelessWidget {
               'Invalid email. Please provide a valid @scu.edu email address.');
         }
       }
-    } catch (e) {
+    } on FirebaseAuthException catch (e) {
       // Handle signup errors
-      displaySnackBar(context, 'Invalid email or password.');
+      if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+        displaySnackBar(context, 'Invalid email or password.');
+      }
       print('Signup failed: $e');
     }
   }
@@ -96,7 +97,10 @@ class SignupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Bronco Help', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red[300],),
+      appBar: AppBar(
+        title: Text('Bronco Help', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.red[300],
+      ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(

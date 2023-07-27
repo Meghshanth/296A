@@ -24,7 +24,7 @@ class Review {
   final String service;
   final String businessName;
   final String userid;
-  final int pricing;
+  final double pricing;
   final int rating;
   final String comment;
 
@@ -64,6 +64,7 @@ class _ReviewViewState extends State<ReviewView> {
   int _rating = 0;
   String selectedService = "";
   String selectedRegion = "";
+  String uuid = "";
   TextEditingController _businessNameController = TextEditingController();
   TextEditingController _pricingController = TextEditingController();
   TextEditingController _commentController = TextEditingController();
@@ -160,6 +161,8 @@ class _ReviewViewState extends State<ReviewView> {
         _commentController.text = review!.comment;
         _pricingController.text = review!.pricing.toString();
         setState(() {
+          final User? user = FirebaseAuth.instance.currentUser;
+          uuid = user!.uid;
           selectedRegion = review!.region;
           selectedService = review!.service;
           _rating = review!.rating;
@@ -231,7 +234,7 @@ class _ReviewViewState extends State<ReviewView> {
         'region': selectedRegion,
         'businessName': _businessNameController.text,
         'service': selectedService,
-        'pricing': int.parse(_pricingController.text),
+        'pricing': double.parse(_pricingController.text),
         'rating': _rating,
         'comment': _commentController.text
       });
@@ -344,7 +347,7 @@ class _ReviewViewState extends State<ReviewView> {
               controller: _pricingController,
               keyboardType: TextInputType.number,
               inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly,
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
               ],
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
@@ -418,20 +421,22 @@ class _ReviewViewState extends State<ReviewView> {
               ),
             ),
             SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceEvenly, // Updated MainAxisAlignment
-              children: [
-                ElevatedButton(
-                  onPressed: isEditable ? () => saveFields() : null,
-                  child: Text('Submit'),
-                ),
-                ElevatedButton(
-                  onPressed: isEditable ? () => deleteReview() : null,
-                  child: Text('Delete'),
-                ),
-              ],
-            ),
+            if (!isLoading)
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceEvenly, // Updated MainAxisAlignment
+                children: [
+                  ElevatedButton(
+                    onPressed: isEditable ? () => saveFields() : null,
+                    child: Text('Submit'),
+                  ),
+                  if (userid == uuid)
+                    ElevatedButton(
+                      onPressed: isEditable ? () => deleteReview() : null,
+                      child: Text('Delete'),
+                    ),
+                ],
+              ),
           ],
         ),
       ),

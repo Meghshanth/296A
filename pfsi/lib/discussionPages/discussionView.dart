@@ -108,7 +108,7 @@ class _DiscussionViewState extends State<DiscussionView> {
     String? uuid = user?.uid;
     if (uuid != null) {
       Map<String, dynamic> newComment = {
-        'userid': userid,
+        'userid': uuid,
         'reply': _replyController.text,
         'dateTimestamp': Timestamp.now()
       };
@@ -214,7 +214,7 @@ class _DiscussionViewState extends State<DiscussionView> {
                                     children: [
                                       Text(
                                           style: TextStyle(fontSize: 12),
-                                          DateFormat('yyyy-MM-dd HH:mm:ss')
+                                          DateFormat('yyyy-MM-dd HH:mm')
                                               .format(comments[index]
                                                       ['dateTimestamp']
                                                   .toDate())),

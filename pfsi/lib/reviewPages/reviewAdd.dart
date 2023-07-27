@@ -162,7 +162,7 @@ class _AddReviewWidgetState extends State<AddReview> {
           "comment": _commentController.text,
           "dateTimestamp": DateTime.now(),
           "userid": uuid,
-          "pricing": int.parse(_pricingController.text),
+          "pricing": double.parse(_pricingController.text),
           "rating": _rating,
           "region": selectedRegion,
           "service": selectedService
@@ -263,7 +263,7 @@ class _AddReviewWidgetState extends State<AddReview> {
               controller: _pricingController,
               keyboardType: TextInputType.number,
               inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly,
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
               ],
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
