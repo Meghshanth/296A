@@ -209,7 +209,7 @@ class _ReviewPageState extends State<Review> with TickerProviderStateMixin {
         backgroundColor: Colors.red[300],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [

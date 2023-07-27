@@ -208,7 +208,8 @@ class _AddReviewWidgetState extends State<AddReview> {
         ],
         backgroundColor: Colors.red[300],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
