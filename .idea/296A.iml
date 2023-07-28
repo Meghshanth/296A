@@ -3,17 +3,13 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/pfsi/build" />
       <excludeFolder url="file://$MODULE_DIR$/pfsi/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/pfsi/.dart_tool" />
-      <excludeFolder url="file://$MODULE_DIR$/pfsi/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/example/.dart_tool" />
-      <excludeFolder url="file://$MODULE_DIR$/pfsi/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/example/build" />
-      <excludeFolder url="file://$MODULE_DIR$/pfsi/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/example/.pub" />
-      <excludeFolder url="file://$MODULE_DIR$/pfsi/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/.dart_tool" />
-      <excludeFolder url="file://$MODULE_DIR$/pfsi/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/.pub" />
-      <excludeFolder url="file://$MODULE_DIR$/pfsi/windows/flutter/ephemeral/.plugin_symlinks/firebase_core/build" />
+      <excludeFolder url="file://$MODULE_DIR$/pfsi/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Dart SDK" level="project" />
+    <orderEntry type="library" name="Dart Packages" level="project" />
   </component>
 </module>
