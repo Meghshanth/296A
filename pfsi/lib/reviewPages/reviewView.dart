@@ -268,7 +268,7 @@ class _ReviewViewState extends State<ReviewView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Add Review',
+          'View Review',
           style: TextStyle(color: Colors.white),
         ),
         leading: IconButton(
